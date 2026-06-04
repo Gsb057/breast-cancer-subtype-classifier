@@ -11,6 +11,10 @@ patient_id_phenotype = filtered['sampleID']
 intersecting_patient_ids = list(set(patient_id_raw).intersection(set(patient_id_phenotype)))
 intersecting_patient_ids.insert(0,"sample")
 filtered_exp_file = raw_expression_file[intersecting_patient_ids]
+
+
+gene_zero_count = (filtered_exp_file==0).sum(axis = 1)
+filtered_exp_file = filtered_exp_file[gene_zero_count <= 115]
+
 filtered_exp_file.to_csv('output/cleaned_expression_data.csv', index=False)
 
-print(filtered_exp_file.shape)
