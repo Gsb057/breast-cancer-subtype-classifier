@@ -18,4 +18,10 @@ filtered_exp_file = raw_expression_file[intersecting_patient_ids]
 gene_zero_count = (filtered_exp_file==0).sum(axis = 1)
 filtered_exp_file = filtered_exp_file[gene_zero_count <= 115]
 
+#finding duplicate genes, and among dupes keeping the genes with high expression only:
+'''
+duplicate_genes = filtered_exp_file.duplicated(subset='sample', keep= False).sum()
+print(duplicate_genes)
+'''
+
 filtered_exp_file.to_csv('output/cleaned_expression_data.csv', index=False)
