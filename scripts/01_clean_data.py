@@ -1,5 +1,6 @@
 import pandas
 
+
 raw_phenotype_file = pandas.read_csv(r"raw_data\TCGA.BRCA.sampleMap_BRCA_clinicalMatrix", sep='\t')
 subtype_column = raw_phenotype_file['PAM50Call_RNAseq']
 filtered = raw_phenotype_file[subtype_column.isin(['LumA','Basal'])]
@@ -17,4 +18,3 @@ gene_zero_count = (filtered_exp_file==0).sum(axis = 1)
 filtered_exp_file = filtered_exp_file[gene_zero_count <= 115]
 
 filtered_exp_file.to_csv('output/cleaned_expression_data.csv', index=False)
-
