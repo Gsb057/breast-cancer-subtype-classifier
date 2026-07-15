@@ -33,3 +33,11 @@ result <- topTable(
   p.value = 1,
   lfc = 0
 )
+
+#filter genes based on creteria using base r.
+
+sig_genes <- result[which(result$adj.P.Val < 0.05 & abs(result$logFC) > 1), ]
+
+write.csv(sig_genes,
+          file = "output/significant_genes.csv",
+          row.names = TRUE)
