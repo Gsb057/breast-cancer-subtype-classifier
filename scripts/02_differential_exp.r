@@ -41,3 +41,21 @@ sig_genes <- result[which(result$adj.P.Val < 0.05 & abs(result$logFC) > 1), ]
 write.csv(sig_genes,
           file = "output/significant_genes.csv",
           row.names = TRUE)
+
+#get the gene names and filter trainx and testx
+
+test_exp <- read.csv("output/test_X.csv")
+
+filtered_trainx <- exp_df[, colnames(exp_df) %in% rownames(sig_genes),
+                          drop = FALSE]
+filtered_testx <- test_exp[, colnames(test_exp) %in% rownames(sig_genes),
+                           drop = FALSE]
+
+#save the trainx and testx filtered csv.
+
+write.csv(filtered_trainx,
+          file = "output/filtered_train_x.csv",
+          row.names = TRUE)
+write.csv(filtered_testx,
+          file = "output/filtered_test_x.csv",
+          row.names = TRUE)
