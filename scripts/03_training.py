@@ -2,7 +2,9 @@ import pandas
 from sklearn.linear_model import LogisticRegression
 from sklearn.metrics import classification_report, accuracy_score, confusion_matrix
 from sklearn.ensemble import RandomForestClassifier
+from sklearn.svm import SVC
 import numpy as np
+import joblib
 
 #read the files needed and store them in variables.
 exp_train = pandas.read_csv("output/filtered_train_x.csv", index_col= 0)
@@ -140,8 +142,8 @@ print("l_r_model classes: ")
 print(l_r_model.classes_)'''
 
 #getting precision recall f1 score for both logistic model
-normal_l_r_classification = classification_report(meta_test.values.ravel(), prediction)
-balanced_l_r_classification = classification_report(meta_test.values.ravel(), bal_prediction)
+normal_l_r_classification_report = classification_report(meta_test.values.ravel(), prediction, output_dict= True)
+balanced_l_r_classification_report = classification_report(meta_test.values.ravel(), bal_prediction, output_dict= True)
 
 '''
 print("Normal Logistic regression classification report: ")
@@ -158,5 +160,43 @@ rfc_predict = random_forest_classifier.predict(exp_test)
 
 #Evaluate the model by getting confusion matrix, accuracy score, classification report.
 rfc_accuracy = accuracy_score(meta_test.values.ravel(), rfc_predict)
-rfc_classification_report = classification_report(meta_test.values.ravel(), rfc_predict)
+rfc_classification_report = classification_report(meta_test.values.ravel(), rfc_predict, output_dict= True)
 rfc_confusion_matrix = confusion_matrix(meta_test.values.ravel(), rfc_predict)
+
+#Train and predict using Support Vector Machine(SVM)
+svm = SVC()
+svm.fit(exp_train, meta_train.values.ravel())
+svm_predict = svm.predict(exp_test)
+
+#Evaluate the model by getting confusion matrix, accuracy score, classification report.
+svm_accuracy = accuracy_score(meta_test.values.ravel(), svm_predict)
+svm_classification_report = classification_report(meta_test.values.ravel(), svm_predict, output_dict= True)
+svm_confusion_matrix = confusion_matrix(meta_test.values.ravel(), svm_predict)
+
+#compare all trained model by making a table.
+models = ("Logistic Regression", "Balanced Logistic Regression", "Random Forest", "SVM")
+accuracy_overall = (normal_l_r_accuracy, balanced_l_r_accuracy, rfc_accuracy, svm_accuracy)
+precision_overall = (normal_l_r_classification_report['macro avg']['precision'],
+                    balanced_l_r_classification_report['macro avg']['precision'],
+                    rfc_classification_report['macro avg']['precision'],
+                    svm_classification_report['macro avg']['precision'])
+recall_overall = (normal_l_r_classification_report['macro avg']['recall'],
+                  balanced_l_r_classification_report['macro avg']['recall'],
+                  rfc_classification_report['macro avg']['recall'],
+                  svm_classification_report['macro avg']['recall'])
+f1_score_overall = (normal_l_r_classification_report['macro avg']['f1-score'],
+                    balanced_l_r_classification_report['macro avg']['f1-score'],
+                    rfc_classification_report['macro avg']['f1-score'],
+                    svm_classification_report['macro avg']['f1-score'])
+comparison_table = pandas.DataFrame({
+    "Model": models,
+    "Accuracy": accuracy_overall,
+    "Precision": precision_overall,
+    "Recall": recall_overall,
+    "F1-score": f1_score_overall
+})
+
+#print(comparison_table)
+
+#logistic regression model was selected, saving the trained model for future use.
+joblib.dump(l_r_model, 'models/logistic_regression_model.pkl')
