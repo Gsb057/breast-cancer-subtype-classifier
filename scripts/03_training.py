@@ -1,7 +1,7 @@
 import pandas
 from sklearn.linear_model import LogisticRegression
-from sklearn.metrics import confusion_matrix
-from sklearn.metrics import classification_report
+from sklearn.metrics import classification_report, accuracy_score, confusion_matrix
+from sklearn.ensemble import RandomForestClassifier
 import numpy as np
 
 #read the files needed and store them in variables.
@@ -103,10 +103,10 @@ coef_table = pandas.DataFrame({
 ascending_coef = coef_table.sort_values("Coef", ascending= True)
 descending_coef = coef_table.sort_values("Coef", ascending= False)
 
-print("Top Basal-associated genes(normal_logistic_reg):")
+'''print("Top Basal-associated genes(normal_logistic_reg):")
 print(ascending_coef.head())
 print("Top LumA-associated genes(normal_logistic_reg):")
-print(descending_coef.head())
+print(descending_coef.head())'''
 
 # Repeat the coefficient extraction for the balanced Logistic Regression model
 # to determine whether class weighting changes the learned gene importance.
@@ -118,27 +118,45 @@ bal_coef_table = pandas.DataFrame({
 ascending_bal_coef = bal_coef_table.sort_values("Coef", ascending=True)
 descending_bal_coef = bal_coef_table.sort_values("Coef", ascending=False)
 
-print("Top Basal-associated genes(balanced_logistic_reg):")
+'''print("Top Basal-associated genes(balanced_logistic_reg):")
 print(ascending_bal_coef.head())
 print("Top LumA-associated genes(balanced_logistic_reg):")
-print(descending_bal_coef.head())
+print(descending_bal_coef.head())'''
 
 #creating confusion matrix for both normal and balanced logistic regression models.
-normal_confusion_matrix = confusion_matrix(meta_test.values.ravel(), prediction)
-balanced_confusion_matrix = confusion_matrix(meta_test.values.ravel(), bal_prediction)
+normal_l_r_confusion_matrix = confusion_matrix(meta_test.values.ravel(), prediction)
+balanced_l_r_confusion_matrix = confusion_matrix(meta_test.values.ravel(), bal_prediction)
 
+#getting accuracy for both normal and balanced logistic regression models:
+normal_l_r_accuracy = accuracy_score(meta_test.values.ravel(), prediction)
+balanced_l_r_accuracy = accuracy_score(meta_test.values.ravel(), bal_prediction)
+
+'''
 print("Normal Logistic regression confusion matrix: ")
-print(normal_confusion_matrix)
+print(normal_l_r_confusion_matrix)
 print("Balanced Logistic regression confusion matrix: ")
-print(balanced_confusion_matrix)
+print(balanced_l_r_confusion_matrix)
 print("l_r_model classes: ")
-print(l_r_model.classes_)
+print(l_r_model.classes_)'''
 
 #getting precision recall f1 score for both logistic model
-normal_classification = classification_report(meta_test.values.ravel(), prediction)
-balanced_classification = classification_report(meta_test.values.ravel(), bal_prediction)
+normal_l_r_classification = classification_report(meta_test.values.ravel(), prediction)
+balanced_l_r_classification = classification_report(meta_test.values.ravel(), bal_prediction)
 
+'''
 print("Normal Logistic regression classification report: ")
-print(normal_classification)
+print(normal_l_r_classification)
 print("Balanced Logistic regression classification report: ")
-print(balanced_classification)
+print(balanced_l_r_classification)'''
+
+#Train and predict using random forest classifier
+
+random_forest_classifier = RandomForestClassifier()
+random_forest_classifier.fit(exp_train, meta_train.values.ravel())
+
+rfc_predict = random_forest_classifier.predict(exp_test)
+
+#Evaluate the model by getting confusion matrix, accuracy score, classification report.
+rfc_accuracy = accuracy_score(meta_test.values.ravel(), rfc_predict)
+rfc_classification_report = classification_report(meta_test.values.ravel(), rfc_predict)
+rfc_confusion_matrix = confusion_matrix(meta_test.values.ravel(), rfc_predict)
