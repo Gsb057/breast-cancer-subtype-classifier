@@ -7,6 +7,21 @@ meta_data <- read.csv("output/train_y.csv")
 rownames(exp_df) <- exp_df[, 1]
 exp_df <- exp_df[, -1]
 
+gene_map <- read.csv("output/gene_symbol_map.csv")
+
+for (i in seq_len(nrow(gene_map))){
+  old_name <- gene_map$x[i]
+  new_name <- gene_map$Suggested.Symbol[i]
+
+  if (old_name %in% colnames(exp_df)) {
+    colnames(exp_df)[
+      colnames(exp_df) == old_name
+    ] <- new_name
+  }
+}
+
+print("CCDC170" %in% colnames(exp_df))
+print("C6orf97" %in% colnames(exp_df))
 #transpose the expression data.
 transposed_exp <- as.data.frame(t(exp_df))
 
@@ -46,6 +61,23 @@ write.csv(sig_genes,
 
 test_exp <- read.csv("output/test_X.csv")
 
+rownames(test_exp) <- test_exp[, 1]
+test_exp <- test_exp[, -1]
+
+for (i in seq_len(nrow(gene_map))){
+  old_name <- gene_map$x[i]
+  new_name <- gene_map$Suggested.Symbol[i]
+
+  if (old_name %in% colnames(test_exp)) {
+    colnames(test_exp)[
+      colnames(test_exp) == old_name
+    ] <- new_name
+  }
+}
+
+print("CCDC170" %in% colnames(test_exp))
+print("C6orf97" %in% colnames(test_exp))
+
 filtered_trainx <- exp_df[, colnames(exp_df) %in% rownames(sig_genes),
                           drop = FALSE]
 filtered_testx <- test_exp[, colnames(test_exp) %in% rownames(sig_genes),
@@ -59,3 +91,11 @@ write.csv(filtered_trainx,
 write.csv(filtered_testx,
           file = "output/filtered_test_x.csv",
           row.names = TRUE)
+
+print(ncol(filtered_trainx))
+print(ncol(filtered_testx))
+
+print(identical(
+    colnames(filtered_trainx),
+    colnames(filtered_testx)
+))

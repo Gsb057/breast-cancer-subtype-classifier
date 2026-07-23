@@ -44,4 +44,6 @@ matching_genes <- sig_gene[sig_gene %in% colnames(transposed_exp)]
 
 missing_genes <- sig_gene[!sig_gene %in% colnames(transposed_exp)]
 
-print(missing_genes)
+write.csv(validgenes,
+          "output/gene_symbol_map.csv",
+          row.names = FALSE)

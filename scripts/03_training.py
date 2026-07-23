@@ -200,3 +200,7 @@ comparison_table = pandas.DataFrame({
 
 #logistic regression model was selected, saving the trained model for future use.
 joblib.dump(l_r_model, 'models/logistic_regression_model.pkl')
+
+print(exp_train.shape)
+print(exp_test.shape)
+print(l_r_model.coef_.shape)
