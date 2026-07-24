@@ -7,8 +7,8 @@ import numpy as np
 import joblib
 
 #read the files needed and store them in variables.
-exp_train = pandas.read_csv("output/filtered_train_x.csv", index_col= 0)
-exp_test = pandas.read_csv("output/filtered_test_x.csv", index_col= 0)
+exp_train = pandas.read_csv("output/matching_train_x.csv", index_col= 0)
+exp_test = pandas.read_csv("output/matching_test_x.csv", index_col= 0)
 
 meta_train = pandas.read_csv("output/train_y.csv", index_col= 0)
 meta_test = pandas.read_csv("output/test_y.csv", index_col= 0)
@@ -70,7 +70,7 @@ bal_l_r_model.fit(exp_train, meta_train.values.ravel())
 
 bal_prediction = bal_l_r_model.predict(exp_test)
 
-#prediction accuracy for balanced logisticregression is also 116/116. 
+#prediction accuracy for balanced logisticregression is also 116/116.
 '''list1 = np.array(bal_prediction)
 list2 = np.array(meta_test.values.ravel())
 

@@ -1,6 +1,3 @@
-library(HGNChelper)
-library(styler)
-
 
 exp_data <- readRDS("data_clean/GSE96058_expr_LumA_Basal.rds")
 meta_data <- read.csv("data_clean/GSE96058_pheno_LumA_Basal.csv")
@@ -24,26 +21,53 @@ matching_genes <- sig_gene[sig_gene %in% colnames(transposed_exp)]
 
 missing_genes <- sig_gene[!sig_gene %in% colnames(transposed_exp)]
 
-outdated <- checkGeneSymbols(missing_genes)
+train_x <- read.csv("output/filtered_train_x.csv")
+test_x <- read.csv("output/filtered_test_x.csv")
 
-validgenes <- outdated[!is.na(outdated$Suggested.Symbol), ]
-matches <- validgenes$Suggested.Symbol %in% colnames(transposed_exp)
+rownames(train_x) <- train_x[, 1]
+train_x <- train_x[, -1]
 
-for (i in seq_len(nrow(validgenes))) {
-  old_name <- validgenes$x[i]
-  new_name <- validgenes$Suggested.Symbol[i]
+rownames(test_x) <- test_x[, 1]
+test_x <- test_x[, -1]
 
-  if (new_name %in% colnames(transposed_exp)) {
-    colnames(transposed_exp)[
-      colnames(transposed_exp) == new_name
-    ] <- old_name
-  }
-}
+matching_train_x <- train_x[, colnames(train_x) %in% matching_genes]
+matching_test_x <- test_x[, colnames(test_x) %in% matching_genes]
 
-matching_genes <- sig_gene[sig_gene %in% colnames(transposed_exp)]
+write.csv(
+  matching_train_x,
+  "output/matching_train_x.csv",
+  row.names = FALSE
+)
+write.csv(
+  matching_test_x,
+  "output/matching_test_x.csv",
+  row.names = FALSE
+)
 
-missing_genes <- sig_gene[!sig_gene %in% colnames(transposed_exp)]
+matching_ext_test_x <- transposed_exp[, matching_genes, drop = FALSE]
 
-write.csv(validgenes,
-          "output/gene_symbol_map.csv",
-          row.names = FALSE)
+matching_ext_test_x <- matching_ext_test_x[
+    ,
+    colnames(matching_train_x),
+    drop = FALSE
+]
+
+write.csv(
+  matching_ext_test_x,
+  "data_clean/matching_ext_test_x.csv",
+  row.names = FALSE
+)
+
+print(ncol(matching_train_x))
+print(ncol(matching_test_x))
+print(ncol(matching_ext_test_x))
+
+print(identical(
+    colnames(matching_train_x),
+    colnames(matching_test_x)
+))
+
+print(identical(
+    colnames(matching_train_x),
+    colnames(matching_ext_test_x)
+))
