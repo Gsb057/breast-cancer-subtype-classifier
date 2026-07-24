@@ -55,7 +55,7 @@ matching_ext_test_x <- matching_ext_test_x[
 write.csv(
   matching_ext_test_x,
   "data_clean/matching_ext_test_x.csv",
-  row.names = FALSE
+  row.names = TRUE
 )
 
 print(ncol(matching_train_x))
